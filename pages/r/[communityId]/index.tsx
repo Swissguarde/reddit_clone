@@ -7,6 +7,9 @@ import safeJsonStringify from "safe-json-stringify";
 import NotFound from "@/components/Community/NotFound";
 import Header from "@/components/Community/Header";
 import PageContent from "@/components/Layout/PageContent";
+import CreatePostLink from "@/components/Community/CreatePostLink";
+import Head from "next/head";
+import { useRouter } from "next/router";
 
 type CommunityPageProps = {
   communityData: Community;
@@ -14,16 +17,22 @@ type CommunityPageProps = {
 
 const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
   console.log(communityData);
+  const router = useRouter();
+  const { communityId } = router.query;
 
   if (!communityData) {
     return <NotFound />;
   }
   return (
     <>
+      <Head>
+        <title>r/{communityId} - Reddit</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Header communityData={communityData} />
       <PageContent>
         <>
-          <div>LHS</div>
+          <CreatePostLink />
         </>
         <>
           <div>RHS</div>
