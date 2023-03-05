@@ -63,6 +63,7 @@ const useCommunityData = () => {
   };
 
   const joinCommunity = async (communityData: Community) => {
+    setLoading(true);
     // batch write
 
     try {
@@ -102,6 +103,7 @@ const useCommunityData = () => {
   };
 
   const leaveCommunity = async (communityId: string) => {
+    setLoading(true);
     // batch write
     try {
       const batch = writeBatch(firestore);
