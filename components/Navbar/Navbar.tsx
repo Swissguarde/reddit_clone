@@ -1,5 +1,6 @@
 import { auth } from "@/firebase/clientApp";
 import { Flex, Image } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Directory from "./Directory/Directory";
@@ -8,6 +9,10 @@ import SearchInput from "./SearchInput";
 
 const Navbar = () => {
   const [user, loading, error] = useAuthState(auth);
+  const router = useRouter();
+  const handleClick = () => {
+    router.push("/");
+  };
 
   return (
     <Flex
@@ -17,6 +22,7 @@ const Navbar = () => {
       justify={{ md: "space-between" }}
     >
       <Flex
+        onClick={handleClick}
         align="center"
         width={{ base: "40px", md: "auto" }}
         mr={{ base: 0, md: 2 }}
