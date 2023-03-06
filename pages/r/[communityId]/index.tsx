@@ -9,30 +9,27 @@ import Header from "@/components/Community/Header";
 import PageContent from "@/components/Layout/PageContent";
 import CreatePostLink from "@/components/Community/CreatePostLink";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import Posts from "@/components/Posts/Posts";
 
 type CommunityPageProps = {
   communityData: Community;
 };
 
 const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
-  console.log(communityData);
-  const router = useRouter();
-  const { communityId } = router.query;
-
   if (!communityData) {
     return <NotFound />;
   }
   return (
     <>
       <Head>
-        <title>r/{communityId} - Reddit</title>
+        <title>Reddit</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header communityData={communityData} />
       <PageContent>
         <>
           <CreatePostLink />
+          <Posts communityData={communityData} />
         </>
         <>
           <div>RHS</div>
