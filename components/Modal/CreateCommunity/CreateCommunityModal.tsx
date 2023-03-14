@@ -102,7 +102,11 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
 
   return (
     <>
-      <Modal size="lg" isOpen={open} onClose={handleClose}>
+      <Modal
+        size={{ base: "xs", sm: "md", md: "lg" }}
+        isOpen={open}
+        onClose={handleClose}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
