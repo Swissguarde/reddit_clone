@@ -34,7 +34,11 @@ const AuthModal: React.FC = () => {
 
   return (
     <>
-      <Modal isOpen={open} onClose={handleClose}>
+      <Modal
+        size={{ base: "xs", sm: "md" }}
+        isOpen={open}
+        onClose={handleClose}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader textAlign="center">
@@ -54,7 +58,7 @@ const AuthModal: React.FC = () => {
               direction="column"
               align="center"
               justify="center"
-              width="70%"
+              width={{ base: "100%", md: "70%" }}
             >
               {view === "login" || view === "signup" ? (
                 <>
