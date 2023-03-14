@@ -28,6 +28,7 @@ import {
 } from "firebase/firestore";
 import { firestore, storage } from "@/firebase/clientApp";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import useSelectFile from "@/hooks/useSelectFile";
 
 type NewPostFormProps = {
   user: User;
@@ -45,12 +46,12 @@ export type TabItem = {
   icon: typeof Icon.arguments;
 };
 const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
+  const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
   const [textInputs, setTextInputs] = useState({
     title: "",
     body: "",
   });
-  const [selectedFile, setSelectedFile] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
@@ -94,17 +95,17 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
     // redirect user to communityPage
   };
 
-  const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const reader = new FileReader();
-    if (e.target.files?.[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-    }
-    reader.onload = (readerEvent) => {
-      if (readerEvent.target?.result) {
-        setSelectedFile(readerEvent.target.result as string);
-      }
-    };
-  };
+  // const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const reader = new FileReader();
+  //   if (e.target.files?.[0]) {
+  //     reader.readAsDataURL(e.target.files[0]);
+  //   }
+  //   reader.onload = (readerEvent) => {
+  //     if (readerEvent.target?.result) {
+  //       setSelectedFile(readerEvent.target.result as string);
+  //     }
+  //   };
+  // };
 
   const onTextChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -147,7 +148,7 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
           {selectedTab === "Images & Videos" && (
             <ImageUpload
               selectedFile={selectedFile}
-              onSelectImage={onSelectImage}
+              onSelectImage={onSelectFile}
               setSelectedFile={setSelectedFile}
               setSelectedTab={setSelectedTab}
             />

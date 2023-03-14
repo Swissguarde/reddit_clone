@@ -39,7 +39,6 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
         ...prev,
         posts: posts as Array<Post>,
       }));
-      console.log("posts", posts);
     } catch (error: any) {
       console.log("getPostsError", error.message);
     }
