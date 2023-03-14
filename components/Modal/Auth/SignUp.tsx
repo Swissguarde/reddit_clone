@@ -6,7 +6,7 @@ import { useSetRecoilState } from "recoil";
 import { auth, firestore } from "@/firebase/clientApp";
 import { FIREBASE_ERRORS } from "@/firebase/error";
 import { User } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 
 const SignUp = () => {
   const [signUpForm, setSignUpForm] = useState({
@@ -29,10 +29,8 @@ const SignUp = () => {
   };
 
   const createUserDocument = async (user: User) => {
-    await addDoc(
-      collection(firestore, "users"),
-      JSON.parse(JSON.stringify(user))
-    );
+    const docRef = doc(firestore, "users", user.uid);
+    await setDoc(docRef, JSON.parse(JSON.stringify(user)));
   };
 
   useEffect(() => {
