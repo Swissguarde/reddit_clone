@@ -72,7 +72,7 @@ const useCommunityData = () => {
       // create a new community snippet
       const newSnippet: CommunitySnippet = {
         communityId: communityData.id,
-        imageURL: communityData.imageUrl || "",
+        imageURL: communityData.imageURL || "",
       };
 
       batch.set(
@@ -133,9 +133,16 @@ const useCommunityData = () => {
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setCommunityStateValue((prev) => ({
+        ...prev,
+        mySnippets: [],
+      }));
+      return;
+    }
     getMySnippets();
   }, [user]);
+
   return {
     // data and functions
     communityStateValue,
