@@ -1,33 +1,34 @@
-import { Post } from "@/atoms/postAtom";
-import { auth, firestore } from "@/firebase/clientApp";
-import { Box, Flex } from "@chakra-ui/react";
+import { Post, postState } from "@/atoms/postAtom";
+import { firestore } from "@/firebase/clientApp";
+import {
+  Box,
+  Flex,
+  SkeletonCircle,
+  SkeletonText,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { User } from "firebase/auth";
 import {
   collection,
   doc,
+  getDocs,
   increment,
+  orderBy,
+  query,
   serverTimestamp,
   Timestamp,
+  where,
   writeBatch,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
 import CommentInput from "./CommentInput";
-
+import CommentItem, { Comment } from "./CommentItem";
 type CommentsProps = {
   user: User;
   selectedPost: Post | null;
   communityId: string;
-};
-export type Comment = {
-  id: string;
-  creatorId: string;
-  creatorDisplayText: string;
-  communityId: string;
-  postId: string;
-  postTitle: string;
-  text: string;
-  createdAt: Timestamp;
 };
 
 const Comments: React.FC<CommentsProps> = ({
@@ -36,9 +37,11 @@ const Comments: React.FC<CommentsProps> = ({
   communityId,
 }) => {
   const [commentText, setCommentText] = useState("");
-  const [Comments, setComments] = useState<Comment[]>([]);
-  const [fetchLoading, setFetchLoading] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [createLoading, setCreateLoading] = useState(false);
+  const [loadingDeleteId, setLoadingDeleteId] = useState("");
+  const setPostState = useSetRecoilState(postState);
 
   const onCreateComment = async () => {
     setCreateLoading(true);
@@ -59,6 +62,8 @@ const Comments: React.FC<CommentsProps> = ({
 
       batch.set(commentDocRef, newComment);
 
+      newComment.createdAt = { seconds: Date.now() / 1000 } as Timestamp;
+
       // update post numberOfComments +1
       const postDocRef = doc(firestore, "posts", selectedPost?.id!);
       batch.update(postDocRef, {
@@ -69,21 +74,71 @@ const Comments: React.FC<CommentsProps> = ({
       // update client recoil state
       setCommentText("");
       setComments((prev) => [newComment, ...prev]);
+      setPostState((prev) => ({
+        ...prev,
+        selectedPost: {
+          ...prev.selectedPost,
+          numberOfComments: prev.selectedPost?.numberOfComments! + 1,
+        } as Post,
+      }));
     } catch (error) {
       console.log("onCreateComment error", error);
     }
     setCreateLoading(false);
   };
-  const onDeleteComment = async (comment: any) => {
-    // delete comment doc in db
-    // update post numberOfComments -1
-    // update client recoil state
+  const onDeleteComment = async (comment: Comment) => {
+    setLoadingDeleteId(comment.id);
+    try {
+      const batch = writeBatch(firestore);
+      // delete comment doc in db
+      const commentDocRef = doc(firestore, "comments", comment.id);
+      batch.delete(commentDocRef);
+
+      // update post numberOfComments -1
+      const postDocRef = doc(firestore, "posts", selectedPost?.id!);
+      batch.update(postDocRef, {
+        numberOfComments: increment(-1),
+      });
+
+      await batch.commit();
+
+      // update client recoil state
+      setPostState((prev) => ({
+        ...prev,
+        selectedPost: {
+          ...prev.selectedPost,
+          numberOfComments: prev.selectedPost?.numberOfComments! - 1,
+        } as Post,
+      }));
+      setComments((prev) => prev.filter((item) => item.id !== comment.id));
+    } catch (error) {
+      console.log("onDeleteComment error", error);
+    }
+    setLoadingDeleteId("");
   };
-  const getPostComments = async () => {};
+  const getPostComments = async () => {
+    try {
+      const commentQuery = query(
+        collection(firestore, "comments"),
+        where("postId", "==", selectedPost?.id),
+        orderBy("createdAt", "desc")
+      );
+      const commentDocs = await getDocs(commentQuery);
+      const comments = commentDocs.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setComments(comments as Array<Comment>);
+    } catch (error) {
+      console.log("getPostComments error", error);
+    }
+    setFetchLoading(false);
+  };
 
   useEffect(() => {
+    if (!selectedPost) return;
     getPostComments();
-  }, []);
+  }, [selectedPost]);
 
   return (
     <Box bg="white" borderRadius="0px 0px 4px 4px" p={2}>
@@ -95,14 +150,58 @@ const Comments: React.FC<CommentsProps> = ({
         fontSize="10pt"
         width="100%"
       >
-        <CommentInput
-          user={user}
-          commentText={commentText}
-          setCommentText={setCommentText}
-          createLoading={createLoading}
-          onCreateComment={onCreateComment}
-        />
+        {!fetchLoading && (
+          <CommentInput
+            user={user}
+            commentText={commentText}
+            setCommentText={setCommentText}
+            createLoading={createLoading}
+            onCreateComment={onCreateComment}
+          />
+        )}
       </Flex>
+
+      <Stack spacing={6} p={2}>
+        {fetchLoading ? (
+          <>
+            {[0, 1, 2].map((item) => (
+              <Box key={item} padding="6" bg="white">
+                <SkeletonCircle size="10" />
+                <SkeletonText mt="4" noOfLines={2} spacing="4px" />
+              </Box>
+            ))}
+          </>
+        ) : (
+          <>
+            {comments.length === 0 ? (
+              <Flex
+                direction="column"
+                justify="center"
+                align="center"
+                borderTop="1px solid"
+                borderColor="gray.100"
+                p={20}
+              >
+                <Text fontWeight={700} opacity={0.3}>
+                  No Comments Yet
+                </Text>
+              </Flex>
+            ) : (
+              <>
+                {comments.map((comment) => (
+                  <CommentItem
+                    comment={comment}
+                    onDeleteComment={onDeleteComment}
+                    loadingDelete={loadingDeleteId === comment.id}
+                    userId={user.uid}
+                    key={comment.id}
+                  />
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </Stack>
     </Box>
   );
 };
