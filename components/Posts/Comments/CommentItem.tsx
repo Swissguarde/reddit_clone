@@ -12,7 +12,7 @@ type CommentItemProps = {
   comment: Comment;
   onDeleteComment: (commentt: Comment) => void;
   loadingDelete: boolean;
-  userId: string;
+  userId?: string;
 };
 
 export type Comment = {

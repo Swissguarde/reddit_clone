@@ -44,10 +44,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
             }}
           />
           <Flex
-            // position="absolute"
-            // left="1px"
-            right={0.1}
-            bottom="1px"
+            mt={2}
             justify="flex-end"
             bg="gray.100"
             p="6px 8px"
@@ -55,7 +52,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
           >
             <Button
               height="26px"
-              disabled={!commentText.length}
+              isDisabled={!commentText.length}
               isLoading={createLoading}
               onClick={() => onCreateComment(commentText)}
             >
