@@ -1,33 +1,30 @@
+import { communityState } from "@/atoms/communitiesAtom";
+import { auth, firestore } from "@/firebase/clientApp";
 import {
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Text,
   Box,
-  Divider,
-  Input,
-  Stack,
+  Button,
   Checkbox,
+  Divider,
   Flex,
   Icon,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { BsFillEyeFill, BsFillPersonFill } from "react-icons/bs";
 import { HiLockClosed } from "react-icons/hi";
-import React, { useState } from "react";
-import {
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
-import { auth, firestore } from "@/firebase/clientApp";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
 
 type CreateCommunityModalProps = {
   open: boolean;
@@ -44,6 +41,8 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
   const [communityType, setCommunityType] = useState("public");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const setSnippetState = useSetRecoilState(communityState);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > 21) return;
@@ -97,6 +96,12 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
       console.log(error);
       setError(error.message);
     }
+    setSnippetState((prev) => ({
+      ...prev,
+      mySnippets: [],
+    }));
+    handleClose();
+    router.push(`r/${communityName}`);
     setLoading(false);
   };
 
