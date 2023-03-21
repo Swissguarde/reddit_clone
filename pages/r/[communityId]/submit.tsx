@@ -15,7 +15,11 @@ const SubmitPostPage: React.FC = () => {
     <PageContent>
       <>
         <Box p="14px 0px" borderBottom="1px solid" borderColor="white">
-          <Text>Create a Post</Text>
+          {user ? (
+            <Text>Create a Post</Text>
+          ) : (
+            <Text>Login to create a post</Text>
+          )}
         </Box>
         {user && <NewPostForm user={user} />}
       </>

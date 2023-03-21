@@ -16,7 +16,7 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 const useCommunityData = () => {
   const setAuthModalState = useSetRecoilState(authModalState);
@@ -26,6 +26,7 @@ const useCommunityData = () => {
   const [error, setError] = useState("");
   const [user] = useAuthState(auth);
   const router = useRouter();
+
   const onJoinOrLeaveCommunity = (
     communityData: Community,
     isJoined: boolean
@@ -75,6 +76,7 @@ const useCommunityData = () => {
       const newSnippet: CommunitySnippet = {
         communityId: communityData.id,
         imageURL: communityData.imageURL || "",
+        isModerator: user?.uid === communityData.creatorId,
       };
 
       batch.set(
@@ -151,13 +153,14 @@ const useCommunityData = () => {
   };
 
   useEffect(() => {
-    if (!user) {
-      setCommunityStateValue((prev) => ({
-        ...prev,
-        mySnippets: [],
-      }));
-      return;
-    }
+    // if (!user) {
+    //   setCommunityStateValue((prev) => ({
+    //     ...prev,
+    //     mySnippets: [],
+    //   }));
+    //   return;
+    // }
+    if (!user) return;
     getMySnippets();
   }, [user]);
 
@@ -173,6 +176,7 @@ const useCommunityData = () => {
     communityStateValue,
     onJoinOrLeaveCommunity,
     loading,
+    getMySnippets,
   };
 };
 export default useCommunityData;
