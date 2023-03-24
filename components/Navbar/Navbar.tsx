@@ -3,21 +3,15 @@ import { auth } from "@/firebase/clientApp";
 import useCommunityData from "@/hooks/useCommunityData";
 import useDirectory from "@/hooks/useDirectory";
 import { Flex, Image } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Directory from "./Directory/Directory";
 import RightContent from "./RightContent/RightContent";
 import SearchInput from "./SearchInput";
 
 const Navbar = () => {
-  const [user, loading, error] = useAuthState(auth);
-  const router = useRouter();
+  const [user] = useAuthState(auth);
   const { onSelectMenuItem } = useDirectory();
-  const handleClick = () => {
-    router.push("/");
-    onSelectMenuItem(defaultMenuItem);
-  };
 
   const { getMySnippets } = useCommunityData();
 
@@ -34,11 +28,12 @@ const Navbar = () => {
       justify={{ md: "space-between" }}
     >
       <Flex
-        onClick={handleClick}
+        // onClick={handleClick}
         align="center"
         width={{ base: "40px", md: "auto" }}
         mr={{ base: 0, md: 2 }}
         cursor="pointer"
+        onClick={() => onSelectMenuItem(defaultMenuItem)}
       >
         <Image src="/images/redditFace.svg" height="30px" />
         <Image

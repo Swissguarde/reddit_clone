@@ -1,5 +1,6 @@
 import { communityState } from "@/atoms/communitiesAtom";
 import { auth, firestore } from "@/firebase/clientApp";
+import useDirectory from "@/hooks/useDirectory";
 import {
   Box,
   Button,
@@ -43,6 +44,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
   const [loading, setLoading] = useState(false);
   const setSnippetState = useSetRecoilState(communityState);
   const router = useRouter();
+  const { toggleMenuOpen } = useDirectory();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > 21) return;
@@ -101,6 +103,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
       mySnippets: [],
     }));
     handleClose();
+    toggleMenuOpen();
     router.push(`r/${communityName}`);
     setLoading(false);
   };
