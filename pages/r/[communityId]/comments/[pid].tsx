@@ -8,6 +8,7 @@ import useCommunityData from "@/hooks/useCommunityData";
 import usePosts from "@/hooks/usePosts";
 import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -41,6 +42,15 @@ const PostPage = () => {
   return (
     <PageContent>
       <>
+        <Head>
+          <title>Reddit - Join the conversation!</title>
+          <meta
+            name="description"
+            content="Join the discussion and connect with millions of people around the world"
+          />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/images/redditFace.svg" />
+        </Head>
         {/* SelectedPost */}
         {postStateValue.selectedPost && (
           <PostItem

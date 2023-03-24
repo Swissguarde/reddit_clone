@@ -117,8 +117,13 @@ const NewPostForm: React.FC<NewPostFormProps> = ({
   return (
     <>
       <Head>
-        <title>Create Post - r/{communityId}</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Create Post</title>
+        <meta
+          name="description"
+          content="The front page of the internet - where stories come to life"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/images/redditFace.svg" />
       </Head>
       <Flex direction="column" bg="white" borderRadius={4} mt={2}>
         <Flex width="100%">

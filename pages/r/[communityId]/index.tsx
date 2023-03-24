@@ -11,6 +11,7 @@ import CreatePostLink from "@/components/Community/CreatePostLink";
 import Posts from "@/components/Posts/Posts";
 import { useSetRecoilState } from "recoil";
 import About from "@/components/Community/About";
+import Head from "next/head";
 
 type CommunityPageProps = {
   communityData: Community;
@@ -31,6 +32,15 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
 
   return (
     <>
+      <Head>
+        <title>Reddit - r/{`${communityData.id}`}</title>
+        <meta
+          name="description"
+          content="Find your community and share your interests on Reddit."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/images/redditFace.svg" />
+      </Head>
       <Header communityData={communityData} />
       <PageContent>
         <>
